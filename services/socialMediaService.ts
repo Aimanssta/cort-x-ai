@@ -198,22 +198,22 @@ class SocialMediaService {
   getOAuthUrl(platform: SocialPlatform, redirectUri: string): string {
     const configs: Record<SocialPlatform, { clientId: string; scope: string; endpoint: string }> = {
       Facebook: {
-        clientId: process.env.FACEBOOK_APP_ID || '',
+        clientId: import.meta.env.VITE_FACEBOOK_APP_ID || '',
         scope: 'pages_manage_posts,pages_read_engagement',
         endpoint: 'https://www.facebook.com/v18.0/dialog/oauth',
       },
       Instagram: {
-        clientId: process.env.INSTAGRAM_APP_ID || '',
+        clientId: import.meta.env.VITE_INSTAGRAM_APP_ID || '',
         scope: 'instagram_business_content_publish,instagram_business_manage_messages',
         endpoint: 'https://api.instagram.com/oauth/authorize',
       },
       LinkedIn: {
-        clientId: process.env.LINKEDIN_CLIENT_ID || '',
+        clientId: import.meta.env.VITE_LINKEDIN_CLIENT_ID || '',
         scope: 'w_member_social,r_liteprofile',
         endpoint: 'https://www.linkedin.com/oauth/v2/authorization',
       },
       Twitter: {
-        clientId: process.env.TWITTER_API_KEY || '',
+        clientId: import.meta.env.VITE_TWITTER_API_KEY || '',
         scope: 'tweet.write tweet.read users.read',
         endpoint: 'https://twitter.com/i/oauth2/authorize',
       },

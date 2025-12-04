@@ -5,7 +5,7 @@ import gbpDataService from './gbpDataService';
 
 class PostAutomationService {
   private schedules: Map<string, PostScheduleTemplate> = new Map();
-  private activeJobs: Map<string, NodeJS.Timeout> = new Map();
+  private activeJobs: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   constructor() {
     this.loadSchedulesFromStorage();
