@@ -239,16 +239,18 @@ class AuthService {
    * Verify Google Business Profile ownership
    * In production, this would call Google My Business API
    */
-  async verifyGBPOwnership(email: string, gbpId: string): Promise<boolean> {
+  async verifyGBPOwnership(arg1: string, arg2?: string): Promise<boolean> {
     try {
+      // Support flexible calling: verifyGBPOwnership(gbpId) or verifyGBPOwnership(email, gbpId)
+      const gbpId = arg2 ?? arg1;
+
       // In production: Call Google API to verify ownership
       // For demo: Accept any GBP ID with a valid format
       if (!gbpId || gbpId.length < 3) {
         return false;
       }
 
-      // Check if email matches business email
-      // In production: Verify via Google API
+      // Always succeed in demo environment
       return true;
     } catch (error) {
       console.error('Error verifying GBP ownership:', error);
@@ -278,8 +280,10 @@ class AuthService {
           location: 'Downtown, NY',
           color: 'bg-blue-500',
           initials: 'DP',
-          gmb_id: 'gbp_demo_1',
-          verified: true,
+          isConnected: true,
+          lastSync: new Date().toISOString(),
+          websiteUrl: 'downtownpizza.example.com',
+          socials: { facebook: true, instagram: true }
         },
         {
           id: 'demo_business_2',
@@ -288,14 +292,16 @@ class AuthService {
           location: 'Brooklyn, NY',
           color: 'bg-green-500',
           initials: 'BC',
-          gmb_id: 'gbp_demo_2',
-          verified: true,
+          isConnected: true,
+          lastSync: new Date().toISOString(),
+          websiteUrl: 'brooklyncafe.example.com',
+          socials: { facebook: false, instagram: true }
         },
       ];
 
-      // Add to user if not already present
+      // Add to user if not already present (compare by id)
       const newBusinesses = demoBusinesses.filter(
-        db => !this.currentUser!.businesses.find(ub => ub.gmb_id === db.gmb_id)
+        db => !this.currentUser!.businesses.find(ub => ub.id === db.id)
       );
 
       for (const business of newBusinesses) {
@@ -316,7 +322,23 @@ class AuthService {
   private generateToken(email: string): string {
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 15);
-    return `token_${Buffer.from(email).toString('base64')}_${timestamp}_${randomStr}`;
+    // Use browser-safe base64 when Buffer is not available
+    let b64: string;
+    try {
+      if (typeof btoa === 'function') {
+        b64 = btoa(email);
+      } else if (typeof Buffer !== 'undefined') {
+        // Node environment fallback
+        // @ts-ignore
+        b64 = Buffer.from(email).toString('base64');
+      } else {
+        b64 = encodeURIComponent(email);
+      }
+    } catch (e) {
+      b64 = encodeURIComponent(email);
+    }
+
+    return `token_${b64}_${timestamp}_${randomStr}`;
   }
 
   /**
