@@ -11,7 +11,12 @@ const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://cort-x-ai.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Google OAuth2 Client
@@ -27,6 +32,13 @@ const oauth2Client = new google.auth.OAuth2(
  */
 app.post('/auth/google-url', (req, res) => {
   try {
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      return res.status(500).json({ 
+        error: 'Missing Google credentials in environment variables',
+        hint: 'Ensure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set'
+      });
+    }
+
     const authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: [
@@ -38,6 +50,7 @@ app.post('/auth/google-url', (req, res) => {
 
     res.json({ authUrl });
   } catch (error) {
+    console.error('Auth URL generation error:', error);
     res.status(500).json({ error: error.message });
   }
 });
