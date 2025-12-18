@@ -1,0 +1,11 @@
+project = "cort-x-ai"
+
+[[services]]
+name = "backend"
+path = "server"
+# Use a shell invocation so `cd` and chained commands run correctly in the container environment
+startCommand = "sh -lc 'cd server && npm install && npm start'"
+runOnDeploy = true
+
+# Note: Sensitive environment variables (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, JWT_SECRET, etc.)
+# should be set in the Railway dashboard or via the Railway CLI, not committed here.
