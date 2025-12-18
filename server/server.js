@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { google } from 'googleapis';
 import jwt from 'jsonwebtoken';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -24,6 +26,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+// Resolve __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Google OAuth2 Client - Initialize with credentials
 const oauth2Client = new google.auth.OAuth2(
@@ -211,6 +217,17 @@ app.post('/businesses/sync', async (req, res) => {
  */
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Serve static frontend (if build artifacts are copied to server/public)
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('*', (req, res) => {
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.status(404).send('Not Found');
+    }
+  });
 });
 
 app.listen(PORT, () => {
