@@ -8,11 +8,17 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://cort-x-ai-production.up.railway.app';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Middleware
+const allowedOrigins = [FRONTEND_URL, 'https://cort-x-ai.vercel.app', 'http://localhost:5173', 'http://localhost:3000'];
 app.use(cors({
-  origin: ['https://cort-x-ai.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+    return callback(new Error('CORS policy: Origin not allowed'), false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -213,4 +219,5 @@ app.listen(PORT, () => {
   console.log('  - GOOGLE_CLIENT_ID');
   console.log('  - GOOGLE_CLIENT_SECRET');
   console.log('  - GOOGLE_REDIRECT_URI (optional, defaults to http://localhost:5173/auth/callback)');
+  console.log(`  - FRONTEND_URL (allowed CORS origin): ${FRONTEND_URL}`);
 });
