@@ -47,7 +47,6 @@ interface LayoutProps {
   currentProfile: BusinessProfile;
   onSwitchProfile: (profile: BusinessProfile) => void;
   onConnectClick: () => void;
-  onLogout?: () => void;
 }
 
 const Layout: React.FC<LayoutProps> = ({ 
@@ -58,11 +57,8 @@ const Layout: React.FC<LayoutProps> = ({
   currentProfile,
   onSwitchProfile,
   onConnectClick
-    ,
-  onLogout
 }) => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -230,7 +226,7 @@ const Layout: React.FC<LayoutProps> = ({
               </button>
               <div className="relative">
                 <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+
                   className="flex items-center gap-3 pl-4 border-l border-surfaceHighlight hover:opacity-75 transition-opacity"
                 >
                   <img src="https://picsum.photos/40/40" alt="Profile" className="w-8 h-8 rounded-full border border-surfaceHighlight" />
@@ -239,23 +235,6 @@ const Layout: React.FC<LayoutProps> = ({
                     <div className="text-[10px] text-gray-500">olivia@cortx.ai</div>
                   </div>
                 </button>
-                
-                {/* User Menu Dropdown */}
-                {isUserMenuOpen && onLogout && (
-                  <div className="absolute right-0 mt-2 w-48 bg-surface border border-surfaceHighlight rounded-lg shadow-xl overflow-hidden z-50">
-                    <div className="py-2">
-                      <button
-                        onClick={() => {
-                          setIsUserMenuOpen(false);
-                          onLogout();
-                        }}
-                        className="w-full px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left flex items-center gap-2"
-                      >
-                        <span>Logout</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
            </div>
         </header>
